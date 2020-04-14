@@ -1,11 +1,10 @@
+'use strict';
+
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
 
 const cors = require('cors')
-
-const mongoose = require('mongoose')
-mongoose.connect(process.env.MLAB_URI || 'mongodb://localhost/exercise-track' )
 
 app.use(cors())
 
@@ -14,6 +13,13 @@ app.use(bodyParser.json())
 
 
 app.use(express.static('public'))
+
+// log requests
+app.use(({method, path}, res, next) => {
+  console.log(`${method} ${path}`);
+  next();
+});
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
@@ -21,7 +27,7 @@ app.get('/', (req, res) => {
 
 // Not found middleware
 app.use((req, res, next) => {
-  return next({status: 404, message: 'not found'})
+  return next({status: 404, message: 'No exercise here'})
 })
 
 // Error Handling middleware
@@ -44,5 +50,5 @@ app.use((err, req, res, next) => {
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
+  console.log('Listening on port ' + listener.address().port)
 })
