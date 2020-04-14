@@ -1,10 +1,12 @@
 'use strict';
 
-const express = require('express')
-const app = express()
-const bodyParser = require('body-parser')
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const myApp = require('./myApp');
+const utils = require('./utils');
 
-const cors = require('cors')
+const app = express();
 
 app.use(cors())
 
@@ -24,6 +26,13 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// New URL endpoint
+app.post("/api/exercise/new-user", function (req, res, next) {
+  const username = req.body.username;
+  const user = myApp.createUser(username);
+  myApp.saveAndSendUser(user, res, next);
+});
+
 
 // Not found middleware
 app.use((req, res, next) => {
@@ -34,7 +43,9 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   let errCode, errMessage
 
-  if (err.errors) {
+  if (utils.isNewUserRequest(req)) {
+    return next(err);
+  } else if (err.errors) {
     // mongoose validation error
     errCode = 400 // bad request
     const keys = Object.keys(err.errors)
