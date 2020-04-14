@@ -34,6 +34,15 @@ app.post("/api/exercise/new-user", function (req, res, next) {
 });
 
 
+app.get("/api/admin/dropUsers", function (req, res, next) {
+  myApp.removeUsers((err, success) => {
+    if (err) {
+      return next(`Error when deleting urls: ${err}`);
+    }
+    res.send(`Deleted ${success.deletedCount} users.`);
+  })
+});
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({status: 404, message: 'No exercise here'})

@@ -65,7 +65,12 @@ const saveAndSendUser = function (user, res, next) {
     })
 };
 
+const removeUsers = (done, userSelect = {}) => {
+    EtUser.deleteMany(userSelect, defaultDoneCallback(done));
+};
+
 module.exports = {
     createUser,
     saveAndSendUser,
+    removeUsers,
 };
