@@ -45,7 +45,7 @@ const findUserById = (userId, done) => {
 };
 
 /**
- * @param user - user object from User model via createUser()
+ * @param user - user object from EtUser model via createUser()
  * @param res - response object
  * @param next - server's next() handler
  */
@@ -65,6 +65,10 @@ const saveAndSendUser = function (user, res, next) {
     })
 };
 
+const getAllUsers = done => {
+    EtUser.find({}, 'username __id', defaultDoneCallback(done));
+};
+
 const removeUsers = (done, userSelect = {}) => {
     EtUser.deleteMany(userSelect, defaultDoneCallback(done));
 };
@@ -72,5 +76,6 @@ const removeUsers = (done, userSelect = {}) => {
 module.exports = {
     createUser,
     saveAndSendUser,
+    getAllUsers,
     removeUsers,
 };

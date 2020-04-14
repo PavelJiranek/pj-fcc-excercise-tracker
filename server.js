@@ -34,10 +34,19 @@ app.post("/api/exercise/new-user", function (req, res, next) {
 });
 
 
+app.get("/api/exercise/users", function (req, res, next) {
+  myApp.getAllUsers((err, users) => {
+    if (err) {
+      return next(`Error when getting users: ${err}`);
+    }
+    res.json(users);
+  })
+});
+
 app.get("/api/admin/dropUsers", function (req, res, next) {
   myApp.removeUsers((err, success) => {
     if (err) {
-      return next(`Error when deleting urls: ${err}`);
+      return next(`Error when deleting users: ${err}`);
     }
     res.send(`Deleted ${success.deletedCount} users.`);
   })
