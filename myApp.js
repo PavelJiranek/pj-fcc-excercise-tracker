@@ -14,8 +14,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost/exercise-track', 
 
 const Schema = mongoose.Schema;
 
-// et - Exercise tracker
-const etUserSchema = new Schema({
+const userSchema = new Schema({
     _id: {
         'type': String,
         'default': shortId.generate,
@@ -27,9 +26,19 @@ const etUserSchema = new Schema({
     },
 });
 
-const EtUser = mongoose.model("EtUser", etUserSchema);
+// Et - Exercise tracker
+const User = mongoose.model("EtUser", userSchema);
 
-const createUser = username => new EtUser({username});
+const exerciseSchema = new Schema({
+    userId: { type: String, required: true },
+    description: { type: String, required: true },
+    duration: { type: Number, required: true },
+    date: { type: Date, default: Date.now },
+});
+
+const Exercise = mongoose.model("EtExercise", exerciseSchema);
+
+const createUser = username => new User({ username });
 
 const defaultDoneCallback = done => (err, data) => {
     if (err) return done(err);
@@ -41,11 +50,11 @@ const saveUser = function (user, done) {
 };
 
 const findUserById = (userId, done) => {
-    EtUser.findById(userId, 'username __id', defaultDoneCallback(done));
+    User.findById(userId, 'username __id', defaultDoneCallback(done));
 };
 
 /**
- * @param user - user object from EtUser model via createUser()
+ * @param user - user object from User model via createUser()
  * @param res - response object
  * @param next - server's next() handler
  */
@@ -66,11 +75,11 @@ const saveAndSendUser = function (user, res, next) {
 };
 
 const getAllUsers = done => {
-    EtUser.find({}, 'username __id', defaultDoneCallback(done));
+    User.find({}, 'username __id', defaultDoneCallback(done));
 };
 
 const removeUsers = (done, userSelect = {}) => {
-    EtUser.deleteMany(userSelect, defaultDoneCallback(done));
+    User.deleteMany(userSelect, defaultDoneCallback(done));
 };
 
 module.exports = {
