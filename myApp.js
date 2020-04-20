@@ -121,7 +121,7 @@ const getAndSendUserExercises = (query, res, next) => {
             return next('Unknown userId');
         }
         Exercise.find(
-            { userId }, // selection
+            utils.getLogQuerySelection(userId, from, to),
             'description duration date -_id', // projection
             { limit: Number(limit) }, // options
             (err, exerciseData) => { // callback

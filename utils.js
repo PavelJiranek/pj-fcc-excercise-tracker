@@ -27,10 +27,22 @@ const getUserExerciseLog = (user, exercises) => ({
 
 })
 
+const isValidDateString = R.test(/^\d{4}-\d{2}-\d{2}$/);
+
+const getLogQuerySelection = (userId, from = '', to = '') => {
+    const selection = { userId };
+
+    return R.pipe(
+        R.when(() => isValidDateString(from), R.assocPath(['date', '$gte'], from)),
+        R.when(() => isValidDateString(to), R.assocPath(['date', '$lte'], to)),
+    )(selection);
+};
+
 module.exports = {
     getUserId,
     isMongoDupeKeyErr,
     getFormattedDate,
     getUserWithExercise,
     getUserExerciseLog,
+    getLogQuerySelection,
 };
