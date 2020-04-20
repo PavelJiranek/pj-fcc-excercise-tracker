@@ -26,13 +26,14 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
-// New URL endpoint
+/**
+ * User endpoints
+ */
 app.post("/api/exercise/new-user", function (req, res, next) {
   const username = req.body.username;
   const user = myApp.createUser(username);
   myApp.saveAndSendUser(user, res, next);
 });
-
 
 app.get("/api/exercise/users", function (req, res, next) {
   myApp.getAllUsers((err, users) => {
@@ -52,16 +53,34 @@ app.get("/api/admin/dropUsers", function (req, res, next) {
   })
 });
 
+
+/**
+ * Exercise endpoints
+ */
+app.post("/api/exercise/add", function (req, res, next) {
+  const exercise = myApp.createExercise(req.body);
+  myApp.saveAndSendExercise(exercise, res, next);
+});
+
+app.get("/api/admin/dropExercises", function (req, res, next) {
+  myApp.removeExercises((err, success) => {
+    if (err) {
+      return next(`Error when deleting exercises: ${err}`);
+    }
+    res.send(`Deleted ${success.deletedCount} exercises.`);
+  })
+});
+
 // Not found middleware
 app.use((req, res, next) => {
-  return next({status: 404, message: 'No exercise here'})
+  return next({ status: 404, message: 'No exercise here' })
 })
 
 // Error Handling middleware
 app.use((err, req, res, next) => {
   let errCode, errMessage
 
-  if (utils.isNewUserRequest(req)) {
+  if (utils.isNewUserRequest(req) || utils.isNewExerciseRequest(req)) {
     return next(err);
   } else if (err.errors) {
     // mongoose validation error
