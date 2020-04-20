@@ -5,11 +5,12 @@ const getUserId = R.prop('_id');
 const isMongoDupeKeyErr = err => R.propEq('code', 11000, err);
 
 const getFormattedDate = date => date && date.toLocaleDateString('en-US', {
-    weekday: 'long',
+    weekday: 'short',
     year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-});
+    month: 'short',
+    day: '2-digit',
+})
+    .replace(/,/g, ''); // remove commas for FCC test
 
 const getUserWithExercise = (user, exercise) => ({
     username: user.username,
