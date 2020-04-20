@@ -113,19 +113,23 @@ const saveAndSendExercise = function (exercise, res, next) {
 }
 
 const getAndSendUserExercises = (query, res, next) => {
-    const { userId } = query;
+    const { userId, from, to, limit } = query;
     findUserById(userId, (err, userData) => {
         if (err) {
             return next('User not found with error:\n', err);
         } else if (R.isNil(userData)) {
             return next('Unknown userId');
         }
-        Exercise.find({ userId }, 'description duration date -_id', (err, exerciseData) => {
-            if (err) {
-                return next(`Exercises for user ${userId} not found with err:\n${err}`);
-            }
-            res.json(utils.getUserExerciseLog(userData, exerciseData))
-        });
+        Exercise.find(
+            { userId }, // selection
+            'description duration date -_id', // projection
+            { limit: Number(limit) }, // options
+            (err, exerciseData) => { // callback
+                if (err) {
+                    return next(`Exercises for user ${userId} not found with err:\n${err}`);
+                }
+                res.json(utils.getUserExerciseLog(userData, exerciseData))
+            });
     })
 
 };
