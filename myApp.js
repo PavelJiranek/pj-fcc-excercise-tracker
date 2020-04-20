@@ -81,6 +81,15 @@ const saveAndSendUser = function (user, res, next) {
     })
 };
 
+
+const getAllUsers = done => {
+    User.find({}, 'username _id', defaultDoneCallback(done));
+};
+
+const removeUsers = (done, userSelect = {}) => {
+    User.deleteMany(userSelect, defaultDoneCallback(done));
+};
+
 /**
  * save exercise if user exists and send back exercise and user data
  * @param exercise object from Exercise model via createDocument()
@@ -103,12 +112,22 @@ const saveAndSendExercise = function (exercise, res, next) {
     })
 }
 
-const getAllUsers = done => {
-    User.find({}, 'username _id', defaultDoneCallback(done));
-};
+const getAndSendUserExercises = (query, res, next) => {
+    const { userId } = query;
+    findUserById(userId, (err, userData) => {
+        if (err) {
+            return next('User not found with error:\n', err);
+        } else if (R.isNil(userData)) {
+            return next('Unknown userId');
+        }
+        Exercise.find({ userId }, 'description duration date -_id', (err, exerciseData) => {
+            if (err) {
+                return next(`Exercises for user ${userId} not found with err:\n${err}`);
+            }
+            res.json(utils.getUserExerciseLog(userData, exerciseData))
+        });
+    })
 
-const removeUsers = (done, userSelect = {}) => {
-    User.deleteMany(userSelect, defaultDoneCallback(done));
 };
 
 const removeExercises = (done, exerciseSelect = {}) => {
@@ -122,5 +141,6 @@ module.exports = {
     removeUsers,
     createExercise,
     saveAndSendExercise,
+    getAndSendUserExercises,
     removeExercises,
 };

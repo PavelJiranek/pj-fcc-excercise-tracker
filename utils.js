@@ -3,8 +3,6 @@ const R = require('ramda');
 const getUserId = R.prop('_id');
 
 const isMongoDupeKeyErr = err => R.propEq('code', 11000, err);
-const isNewUserRequest = req => R.propEq('url', '/api/exercise/new-user', req);
-const isNewExerciseRequest = req => R.propEq('url', '/api/exercise/add', req);
 
 const getFormattedDate = date => date && date.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -21,11 +19,18 @@ const getUserWithExercise = (user, exercise) => ({
     date: getFormattedDate(exercise.date),
 });
 
+const getUserExerciseLog = (user, exercises) => ({
+    _id: user.id,
+    username: user.username,
+    count: R.length(exercises),
+    log: exercises.map(({ description, duration, date }) => ({ description, duration, date: getFormattedDate(date) })),
+
+})
+
 module.exports = {
     getUserId,
     isMongoDupeKeyErr,
-    isNewUserRequest,
-    isNewExerciseRequest,
     getFormattedDate,
     getUserWithExercise,
+    getUserExerciseLog,
 };
